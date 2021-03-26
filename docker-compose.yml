@@ -1,0 +1,109 @@
+version: '3'
+
+services:
+  oro:
+    image: alpine
+    depends_on:
+      - nginx
+      - php
+      - db
+    networks:
+      - marello
+  # PostgresSQL instead of MySQL
+  db:
+#    image: postgres:9
+#    # command: '' # workaround to override the default mysql db command in docker-compose.yml
+#    environment:
+#      POSTGRES_USER: ${MYSQL_USER}
+#      POSTGRES_PASSWORD: ${MYSQL_PASSWORD}
+#      POSTGRES_DB: ${MYSQL_DATABASE}
+#      PGDATA: /tmp
+#    volumes:
+#      - postgresData:/var/lib/postgresql/data
+#    networks:
+#      - marello
+#    ports:
+#      - "5432:5432"
+    image: "mariadb:10.3"
+    environment:
+      MYSQL_ROOT_PASSWORD: "root"
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - 13306:3306
+    networks:
+      - marello
+
+#  pga:
+#    image: dpage/pgadmin4
+#    environment:
+#      PGADMIN_DEFAULT_EMAIL: "user@example.com"
+#      PGADMIN_DEFAULT_PASSWORD: "password"
+#    ports:
+#      - "8082:80"
+#    depends_on:
+#      - db
+#    networks:
+#      - marello
+  php:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      args:
+        TIMEZONE: ${TIMEZONE}
+    volumes:
+      - sync-marello:/var/www/shop/:nocopy
+      - /home/art/.ssh/id_rsa:/var/id_rsa
+    links:
+      - db
+    depends_on:
+      - db
+    networks:
+      - marello
+  # PHP Message Consumer
+  php-mq:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+      args:
+        TIMEZONE: ${TIMEZONE}
+    volumes:
+      - sync-marello:/var/www/shop/:nocopy
+    links:
+      - db
+    depends_on:
+      - db
+    networks:
+      - marello
+    command: [ "php", "/var/www/shop/bin/console", "oro:message-queue:consume", "-vvv", "--env=${ENV_MODE}" ]
+  nginx:
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    volumes:
+      - sync-marello:/var/www/shop/:nocopy
+    ports:
+      - 1080:80
+    depends_on:
+      - php
+    networks:
+      - marello
+  mailhog:
+    image: mailhog/mailhog
+    logging:
+      driver: 'none'  # disable saving logs
+    ports:
+      - 11025:1025 # smtp server
+      - 18025:8025 # web ui
+    networks:
+      - marello
+volumes:
+  postgresData:
+  sync-marello:
+    driver_opts:
+      type: 'tmpfs'
+      o: 'bind'
+      device: ${SHOP_HOST_DIR}
+networks:
+  marello:

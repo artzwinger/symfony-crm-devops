@@ -1,0 +1,5 @@
+#!/bin/env bash
+bin/stop-mq
+bin/console cache:clear --env=dev
+bin/console cache:clear --env=prod
+bin/start

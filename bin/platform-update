@@ -1,0 +1,5 @@
+#!/bin/env bash
+bin/stop-mq
+rm -rf src/var/cache/*
+bin/console oro:platform:update --force
+bin/start

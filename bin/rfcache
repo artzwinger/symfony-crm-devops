@@ -1,0 +1,6 @@
+#!/bin/env bash
+bin/stop-mq
+rm -rf src/var/cache/*
+bin/console cache:warmup --env=dev
+bin/console cache:warmup --env=prod
+bin/start
