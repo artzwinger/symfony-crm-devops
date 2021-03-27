@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+bin/stop-mq
+
+#docker-compose exec --env PGPASSWORD=password -T php psql -U app_user --host=db app_db -c 'create database temp1;'
+#docker-compose exec --env PGPASSWORD=password -T php psql -U app_user --host=db temp1 -c 'drop database app_db;'
+#docker-compose exec --env PGPASSWORD=password -T php psql -U app_user --host=db temp1 -c 'create database app_db;'
+#docker-compose exec --env PGPASSWORD=password -T php psql -U app_user --host=db app_db -c 'drop database temp1;'
+#docker-compose exec --env PGPASSWORD=password -T php psql -U app_user --host=db app_db -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
+
+docker-compose exec -T php bash bin/install.sh
+
+bin/start

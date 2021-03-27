@@ -1,2 +1,2 @@
 #!/bin/env bash
-bin/cli composer "$@"
+bin/cli bin/composer.sh "$@"
