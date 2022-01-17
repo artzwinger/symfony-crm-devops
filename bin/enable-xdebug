@@ -1,0 +1,4 @@
+#!/bin/env bash
+docker-compose stop php
+docker-compose build --build-arg XDEBUG_MODE=debug php
+bin/start

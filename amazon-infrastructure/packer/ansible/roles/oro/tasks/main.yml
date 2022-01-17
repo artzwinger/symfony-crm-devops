@@ -1,0 +1,64 @@
+---
+- name: place OroCommerce create project script
+  template:
+    src: create-project.sh.j2
+    dest: /usr/bin/orocommerce_create
+    owner: "{{ owner }}"
+    group: "{{ group }}"
+    mode: 0754
+
+- name: place OroCommerce install script
+  template:
+    src: install.sh.j2
+    dest: /usr/bin/orocommerce_install
+    owner: "{{ owner }}"
+    group: "{{ group }}"
+    mode: 0754
+
+- name: place OroCommerce cache warmer
+  template:
+    src: orocache.j2
+    dest: /usr/bin/orocache
+    owner: "{{ owner }}"
+    group: "{{ group }}"
+    mode: 0754
+
+- name: place OroCommerce init script
+  template:
+    src: oroinit.sh.j2
+    dest: /usr/bin/oroinit
+    owner: "{{ owner }}"
+    group: "{{ group }}"
+    mode: 0754
+
+- name: Create project directory
+  file:
+    path: /usr/app
+    state: directory
+    owner: "{{ owner }}"
+    group: "{{ group }}"
+    mode: 0754
+
+- name: Create Oro Commerce project
+  become: yes
+  become_user: "{{ owner }}"
+  shell: /usr/bin/orocommerce_create
+
+- name: create OroCommerce nginx vhost
+  template:
+    src: vhost.j2
+    dest: /etc/nginx/sites-enabled/default
+    mode: 0644
+
+- name: create OroCommerce supervisor services
+  template:
+    src: orocommerce.service.j2
+    dest: /etc/supervisor/conf.d/orocommerce.conf
+    mode: 0644
+
+- name:
+  ansible.builtin.cron:
+    name: orocrm
+    minute: "*/1"
+    user: "{{ owner }}"
+    job: "php /usr/app/bin/console oro:cron --env=prod"

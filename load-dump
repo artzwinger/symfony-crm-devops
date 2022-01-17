@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+bin/stop
+docker-compose rm db
+docker-compose up -d db
+sleep 10
+docker-compose exec -T db psql --user=app_user --password=password app_db < dump.sql
+bin/restart

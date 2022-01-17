@@ -1,0 +1,28 @@
+# --- Oro application settings ---
+
+sed -i "s/installed:[ ]*[a-zA-Z0-9_%():'~-]*/installed: null/g" ./config/parameters.yml
+
+rm -rf ./var/cache/*
+
+APP_HOST="{{ domain_name }}"
+APP_USER="{{ app_user }}"
+APP_PASSWORD="{{ app_password }}"
+APP_LOAD_DEMO_DATA="{{ app_load_demo }}"
+
+PGPASSWORD={{ db_password }} psql -U {{ db_user }} --host={{ db_host }} postgres -c 'create database temp1;'
+PGPASSWORD={{ db_password }} psql -U {{ db_user }} --host={{ db_host }} temp1 -c 'drop database {{ db_name }};'
+PGPASSWORD={{ db_password }} psql -U {{ db_user }} --host={{ db_host }} temp1 -c 'create database {{ db_name }};'
+PGPASSWORD={{ db_password }} psql -U {{ db_user }} --host={{ db_host }} {{ db_name }} -c 'drop database temp1;'
+PGPASSWORD={{ db_password }} psql -U {{ db_user }} --host={{ db_host }} {{ db_name }} -c 'CREATE EXTENSION IF NOT EXISTS "uuid-ossp";'
+
+php ./bin/console oro:install --env=prod --timeout=900 --no-debug --application-url="http://$APP_HOST/" --organization-name="Oro Inc" --user-name="$APP_USER" --user-email="admin@example.com" --user-firstname="Bob" --user-lastname="Dylan" --user-password="$APP_PASSWORD" --sample-data=$APP_LOAD_DEMO_DATA --language=en --formatting-code=en_US
+
+echo "\n~~~~~~~~~~~~~~ Add Required Permissions for the nginx User ~~~~~~~~~~~~~~\n"
+
+chown -R {{ owner }}:{{ group }} ./var/{sessions,attachment,cache,import_export,logs}
+chown -R {{ owner }}:{{ group }} ./public/{media,uploads,js}
+
+echo "\n**********************************************************************************************************************"
+echo "************** Congratulations! You’ve Successfully Installed OroCommerce Application **********************************"
+echo "**********************************************************************************************************************\n"
+echo "\n************** You should now be able to open the homepage http://$APP_HOST/ and use the application. **************\n"

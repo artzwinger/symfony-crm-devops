@@ -1,0 +1,113 @@
+echo "\n*****************************************************"
+echo "************* Provision process started *************"
+echo "*****************************************************\n"
+
+echo "\n~~~~~~~~~~~~~~ Add repository key ~~~~~~~~~~~~~~\n"
+
+mkdir -p ~/.ssh
+cat <<EOT  >> ~/.ssh/repository
+{{ git_private_key }}
+EOT
+
+chmod 0600 ~/.ssh/repository
+eval `ssh-agent -s`
+ssh-add ~/.ssh/repository
+
+# --- VM settings ---
+
+FORWARDED_PORT={{ frontend_port }}
+
+# --- Settings ---
+
+DB_USER="{{ db_user }}"
+DB_PASSWORD="{{ db_password }}"
+DB_NAME="{{ db_name }}"
+DB_HOST="{{ db_host }}"
+DB_PORT="{{ db_port }}"
+DB_DRIVER="{{ db_driver }}"
+
+SECRET="{{ secret }}"
+
+MAILER_TRANSPORT="{{ mailer_transport }}"
+MAILER_HOST="{{ mailer_host }}"
+MAILER_PORT="{{ mailer_port }}"
+MAILER_ENCRYPTION="{{ mailer_encryption }}"
+MAILER_USER="{{ mailer_user }}"
+MAILER_PASSWORD="{{ mailer_password }}"
+
+WEBSOCKET_BACKEND_HOST="{{ websocket_backend_host }}"
+SESSION_HANDLER="{{ session_handler }}"
+
+echo "\n~~~~~~~~~~~~~~ Add bitbucket.org host ~~~~~~~~~~~~~~\n"
+
+cd /usr/app
+
+ssh-keygen -R github.com
+ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+
+echo "\n~~~~~~~~~~~~~~ Clone project skeleton ~~~~~~~~~~~~~~\n"
+
+git clone git@github.com:noctuasystems/tutorsoft.git .
+
+echo "\n~~~~~~~~~~~~~~ Adjust Redis config ~~~~~~~~~~~~~~\n"
+
+cat >> ./config/parameters.yml.dist <<____REDISCONFIG
+
+    redis_dsn_session: '{{ redis_dsn_session }}'
+    redis_dsn_cache: '{{ redis_dsn_cache }}'
+    redis_dsn_doctrine: '{{ redis_dsn_doctrine }}'
+    redis_dsn_session_type: 'standalone'
+    redis_dsn_cache_type: 'standalone'
+    redis_dsn_doctrine_type: 'standalone'
+
+____REDISCONFIG
+
+cat >> ./config/parameters.yml.dist <<____S3CONFIG
+
+    amazon_s3.bucket_name: {{ amazon_s3_bucket_name }}
+    amazon_s3.key: {{ amazon_s3_key }}
+    amazon_s3.secret: {{ amazon_s3_secret }}
+    amazon_s3.region: {{ amazon_s3_region }}
+
+____S3CONFIG
+
+echo "\n~~~~~~~~~~~~~~ Adjust configuration files ~~~~~~~~~~~~~~\n"
+
+cp ./config/parameters.yml.dist ./config/parameters.yml
+
+sed -i "s/database_user:[ ]*[a-zA-Z0-9_%()'~]*/database_user: $DB_USER/g" ./config/parameters.yml
+sed -i "s/database_password:[ ]*[a-zA-Z0-9_%()'~]*/database_password: '$DB_PASSWORD'/g" ./config/parameters.yml
+sed -i "s/database_name:[ ]*[a-zA-Z0-9_%()'~]*/database_name: $DB_NAME/g" ./config/parameters.yml
+sed -i "s/database_driver:[ ]*[a-zA-Z0-9_%()'~]*/database_driver: $DB_DRIVER/g" ./config/parameters.yml
+sed -i "s/database_host:[ ]*[a-zA-Z0-9_%()'~.]*/database_host: $DB_HOST/g" ./config/parameters.yml
+sed -i "s/database_port:[ ]*[a-zA-Z0-9_%()'~]*/database_port: $DB_PORT/g" ./config/parameters.yml
+
+sed -i "s/installed:[ ]*[a-zA-Z0-9_%()'~]*/installed: '2020-06-16T09:10:39-05:00'/g" ./config/parameters.yml
+sed -i "s/secret:[ ]*[a-zA-Z0-9_%()\/'~]*/secret: '$SECRET'/g" ./config/parameters.yml
+sed -i "s/assets_version:[ ]*[a-zA-Z0-9_%()\/'~]*/assets_version: null/g" ./config/parameters.yml
+
+sed -i "s/mailer_transport:[ ]*[a-zA-Z0-9_%()'~]*/mailer_transport: $MAILER_TRANSPORT/g" ./config/parameters.yml
+sed -i "s/mailer_host:[ ]*[.a-zA-Z0-9_%()\/'~]*/mailer_host: $MAILER_HOST/g" ./config/parameters.yml
+sed -i "s/mailer_port:[ ]*[a-zA-Z0-9_%()\/'~]*/mailer_port: $MAILER_PORT/g" ./config/parameters.yml
+sed -i "s/mailer_encryption:[ ]*[a-zA-Z0-9_%()\/'~]*/mailer_encryption: $MAILER_ENCRYPTION/g" ./config/parameters.yml
+sed -i "s/mailer_user:[ ]*[a-zA-Z0-9_%()\/'~]*/mailer_user: $MAILER_USER/g" ./config/parameters.yml
+sed -i "s/mailer_password:[ ]*[a-zA-Z0-9_%()\/'~]*/mailer_password: $MAILER_PASSWORD/g" ./config/parameters.yml
+
+sed -i "s/session_handler:[ ]*[a-zA-Z0-9._%()\/'~]*/session_handler: '$SESSION_HANDLER'/g" ./config/parameters.yml
+
+#sed -i "s/websocket_backend_host:[ ]*[a-zA-Z0-9_%()\/'~]*/websocket_backend_host: $WEBSOCKET_BACKEND_HOST/g" ./config/parameters.yml
+
+echo "\n~~~~~~~~~~~~~~ Install Application NPM Dependencies ~~~~~~~~~~~~~~\n"
+
+npm install
+
+echo "\n~~~~~~~~~~~~~~ Install Application Dependencies ~~~~~~~~~~~~~~\n"
+
+COMPOSER_MEMORY_LIMIT=-1 composer install --no-interaction
+
+mkdir -p /usr/app/var/sessions
+mkdir -p /usr/app/public/media
+mkdir -p /usr/app/public/uploads
+mkdir -p /usr/app/public/js
+
+touch maintenance.flag

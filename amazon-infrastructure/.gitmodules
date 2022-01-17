@@ -1,0 +1,3 @@
+[submodule "packer"]
+	path = packer
+	url = git@bitbucket.org:allwayssafety/packer.git

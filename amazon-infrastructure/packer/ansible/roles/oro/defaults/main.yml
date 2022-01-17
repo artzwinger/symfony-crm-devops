@@ -1,0 +1,85 @@
+domain_name: "oro.local"
+
+db_user: "dbuser"
+db_password: "DBP@ssword123"
+db_name: "oro"
+db_driver: "pdo_pgsql"
+db_host: "127.0.0.1"
+db_port: "5432"
+db_server_version: "9.6.19"
+
+app_user: "admin"
+app_password: "admin"
+app_load_demo: "y"
+
+secret: 'somesecrettoken'
+
+frontend_port: "80"
+
+owner: "www-data"
+group: "www-data"
+
+amazon_s3_bucket_name: "allwayssafetymedia"
+amazon_s3_key: "allwayssafety"
+amazon_s3_secret: "1234"
+amazon_s3_region: "us-east-2"
+
+mailer_transport: sendmail
+mailer_host: 127.0.0.1
+mailer_port: null
+mailer_encryption: null
+mailer_user: null
+mailer_password: null
+
+websocket_backend_host: "*"
+
+session_handler: 'snc_redis.session.handler'
+redis_dsn_session: 'redis://sessions.1tiznz.ng.0001.use2.cache.amazonaws.com:6379/0'
+redis_dsn_cache: 'redis://appcache.1tiznz.ng.0001.use2.cache.amazonaws.com:6379/0'
+redis_dsn_doctrine: 'redis://appcache.1tiznz.ng.0001.use2.cache.amazonaws.com:6379/0'
+
+supervisor_consumers_count: 2
+supervisor_websockets_count: 1
+
+branch: 'master'
+
+git_private_key: |
+  -----BEGIN OPENSSH PRIVATE KEY-----
+  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
+  -----END OPENSSH PRIVATE KEY-----
+

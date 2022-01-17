@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+cd /var/www/shop && tar -xzf vendor.tar.gz
+rm -rf var/cache/*
+php bin/console cache:warmup --env=dev
+php bin/console cache:warmup --env=prod
+# first arg is `-f` or `--some-option`
+if [ "${1#-}" != "$1" ]; then
+	set -- php-fpm "$@"
+fi
+
+exec "$@"

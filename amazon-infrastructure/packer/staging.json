@@ -1,0 +1,37 @@
+{
+  "variables": {
+    "aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
+    "aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
+    "aws_default_region": "{{env `AWS_DEFAULT_REGION`}}",
+    "ansible_host": "staging"
+  },
+  "builders": [
+    {
+      "type": "amazon-ebs",
+      "access_key": "{{user `aws_access_key`}}",
+      "secret_key": "{{user `aws_secret_key`}}",
+      "region": "{{user `aws_default_region`}}",
+      "source_ami_filter": {
+        "filters": {
+          "name": "LEMP *"
+        },
+        "owners": [
+          "self"
+        ],
+        "most_recent": true
+      },
+      "instance_type": "c5.4xlarge",
+      "ssh_username": "ubuntu",
+      "ami_name": "Staging {{isotime | clean_resource_name}}",
+      "security_group_id": "sg-0f0e372943f3876a5"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "ansible",
+      "playbook_file": "ansible/playbook.yml",
+      "host_alias": "staging"
+    }
+  ]
+}
+

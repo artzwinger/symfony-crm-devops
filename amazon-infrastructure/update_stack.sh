@@ -1,0 +1,8 @@
+#!/bin/bash
+
+source '.env'
+
+AWS_ACCESS_KEY_ID=`echo $AWS_ACCESS_KEY_ID | envsubst` \
+AWS_SECRET_ACCESS_KEY=`echo $AWS_SECRET_ACCESS_KEY | envsubst` \
+AWS_DEFAULT_REGION=`echo $AWS_DEFAULT_REGION | envsubst` \
+terragrunt apply-all --terragrunt-non-interactive

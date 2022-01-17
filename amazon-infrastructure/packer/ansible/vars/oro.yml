@@ -1,0 +1,76 @@
+domain_name: "crm-antiguesserword123.ochsignup.com"
+
+db_user: "CRYpcypcOzMIk"
+db_password: "X0Dq4NbKbOZqTrsLIofi"
+db_name: "zmikliofi"
+db_host: "tutors-prod-restore7nov.cgz2jblrn5va.us-east-2.rds.amazonaws.com"
+
+db_server_version: "9.6.22"
+
+app_user: "admin"
+app_password: "admin"
+app_load_demo: "n"
+
+owner: "www-data"
+group: "www-data"
+
+secret: 'habkfutnfqtpqerlyzabwfkxdlwhmhyr'
+
+mailer_transport: smtp
+mailer_host: email-smtp.us-east-2.amazonaws.com
+mailer_port: 587
+mailer_encryption: tls
+mailer_user: AKIATPSFBDKRBJDJFYM7
+mailer_password: BO6FEaDrPEUkRHZYCMJwXiUNXj3AzQoZaNbU8bHqfwta
+
+session_handler: 'snc_redis.session.handler'
+redis_dsn_session: 'redis://sessions.fle0hj.ng.0001.use2.cache.amazonaws.com:6379/0'
+redis_dsn_cache: 'redis://appcache.fle0hj.ng.0001.use2.cache.amazonaws.com:6379/0'
+redis_dsn_doctrine: 'redis://appcache.fle0hj.ng.0001.use2.cache.amazonaws.com:6379/0'
+
+amazon_s3_bucket_name: "tutorsoftprod"
+amazon_s3_key: "AKIATPSFBDKROLZAIEYS"
+amazon_s3_secret: "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"
+amazon_s3_region: "us-east-2"
+
+branch: 'master'
+git_private_key: |
+    -----BEGIN OPENSSH PRIVATE KEY-----
+    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
+    -----END OPENSSH PRIVATE KEY-----
+

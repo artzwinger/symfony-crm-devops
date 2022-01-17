@@ -1,0 +1,1 @@
+*/1 * * * * su www-data -c "php /var/www/shop/bin/console oro:cron --env=prod > /var/www/shop/var/logs/cron.log"

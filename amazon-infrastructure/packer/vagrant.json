@@ -1,0 +1,48 @@
+{
+  "variables": {
+    "compression_level": "6",
+    "ansible_staging_directory": "/tmp/ansible",
+    "ansible_host": "local"
+  },
+  "builders": [
+    {
+      "communicator": "ssh",
+      "source_path": "ubuntu/bionic64",
+      "provider": "virtualbox",
+      "add_force": true,
+      "type": "vagrant",
+      "template": "Vagrantfile.template"
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "environment_vars": [
+        "ANSIBLE_STAGING_DIRECTORY={{user `ansible_staging_directory`}}",
+        "ANSIBLE_STAGING_DIRECTORY_USER=vagrant",
+        "ANSIBLE_STAGING_DIRECTORY_GROUP=vagrant",
+        "ANSIBLE_STAGING_DIRECTORY_PERMISSIONS=777"
+      ],
+      "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+      "scripts": [
+        "scripts/ansible.sh"
+      ]
+    },
+    {
+      "type": "file",
+      "source": "ansible/",
+      "destination": "{{user `ansible_staging_directory`}}"
+    },
+    {
+      "type": "ansible-local",
+      "staging_directory": "{{user `ansible_staging_directory`}}",
+      "playbook_file": "ansible/playbook.yml",
+      "inventory_groups": "local",
+      "extra_arguments": [
+        "--verbose",
+        "--extra-vars",
+        "\"playbook_directory={{user `ansible_staging_directory`}}\""
+      ]
+    }
+  ]
+}

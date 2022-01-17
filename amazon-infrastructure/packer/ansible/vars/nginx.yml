@@ -1,0 +1,6 @@
+---
+nginx_worker_connections: 1024
+nginx_remove_default_vhost: true
+nginx_ppa_use: true
+nginx_ppa_version: stable
+nginx_user: "www-data"

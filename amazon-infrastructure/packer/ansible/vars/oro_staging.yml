@@ -1,0 +1,36 @@
+domain_name: "staging.allwayssafety.com"
+
+db_user: "orouser"
+db_password: "orouserpass"
+db_name: "oro"
+db_host: "127.0.0.1"
+
+db_server_version: "10.14"
+
+app_user: "admin"
+app_password: "admin"
+app_load_demo: "y"
+
+owner: "www-data"
+group: "www-data"
+
+amazon_s3_bucket_name: "allwayssafetydev"
+amazon_s3_key: "AKIAYJRL6RQTARBSEIVG"
+amazon_s3_secret: "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"
+amazon_s3_region: "us-east-2"
+
+web_backend_prefix: 'admin'
+secret: 'devsecret'
+
+websocket_backend_host: '*'
+
+mailer_transport: smtp
+mailer_host: smtp.mailtrap.io
+mailer_port: 465
+mailer_encryption: null
+mailer_user: 2b0749252cd0de
+mailer_password: 9a5ce7fd8e453e
+
+branch: 'develop'
+
+session_handler: "session.handler.native_file"

@@ -1,0 +1,74 @@
+---
+- hosts: lemp:local
+  become: yes
+  gather_facts: yes
+  vars_files:
+    - "vars/nginx.yml"
+    - "vars/php.yml"
+    - "vars/php.ini.yml"
+    - "vars/nodejs.yml"
+  pre_tasks:
+    - name: Add repository for PHP 7.
+      apt_repository: repo='ppa:ondrej/php'
+    - name: install packages
+      apt:
+        name:
+          - curl
+          - vim
+          - libsystemd-dev
+          - libzip-dev
+          - supervisor
+          - libpq-dev
+          - postgresql-client
+        update_cache: yes
+    - name: Create www-data user
+      user:
+        name: www-data
+        groups:
+          - www-data
+        state: present
+        shell: /bin/bash
+        system: no
+        createhome: yes
+        home: /home/www-data
+  roles:
+    - geerlingguy.git
+    - geerlingguy.nginx
+    - geerlingguy.php
+    - geerlingguy.composer
+    - geerlingguy.nodejs
+- hosts: oro
+  become: yes
+  gather_facts: yes
+  vars_files:
+    - "vars/oro.yml"
+  roles:
+    - oro
+- hosts: local
+  become: yes
+  gather_facts: yes
+  vars_files:
+    - "vars/local.yml"
+    - "vars/oro_local.yml"
+  pre_tasks:
+    - name: install packages
+      apt:
+        name:
+          - python-psycopg2
+  roles:
+    - geerlingguy.postgresql
+    - oro
+- hosts: staging
+  become: yes
+  gather_facts: yes
+  vars_files:
+    - "vars/staging.yml"
+    - "vars/oro_staging.yml"
+  pre_tasks:
+    - name: install packages
+      apt:
+        name:
+          - python-psycopg2
+  roles:
+    - geerlingguy.postgresql
+    - oro

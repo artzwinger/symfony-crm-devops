@@ -1,0 +1,38 @@
+domain_name: "oro.local"
+
+db_user: "postgres"
+db_password: "postgres"
+db_name: "oro"
+db_host: "127.0.0.1"
+
+db_server_version: "10.14"
+
+app_user: "adminaws"
+app_password: "ByupfF^b]v2QI.&Q"
+app_load_demo: "y"
+
+owner: "www-data"
+group: "www-data"
+
+amazon_s3_bucket_name: "allwayssafetyazlocal"
+amazon_s3_key: "AKIAYJRL6RQTARBSEIVG"
+amazon_s3_secret: "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"
+amazon_s3_region: "us-east-2"
+
+web_backend_prefix: 'admin'
+secret: 'localsecret'
+
+websocket_backend_host: '*'
+
+mailer_transport: sendmail
+mailer_host: 127.0.0.1
+mailer_port: null
+mailer_encryption: null
+mailer_user: null
+mailer_password: null
+
+branch: 'master'
+
+session_handler: "session.handler.native_file"
+
+supervisor_consumers_count: 5
